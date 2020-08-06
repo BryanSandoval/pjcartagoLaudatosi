@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>Example</title>
+<script src="https://code.createjs.com/createjs-2015.11.26.min.js"></script>
+<script>
+var stage,queue;
+function init() 
+{
+    stage = new createjs.Stage("canvas");
+    createjs.Ticker.setFPS(12);  //set some FPS
+    createjs.Ticker.addEventListener("tick", stage); //set autiomatic refresh, so we don't need to use stage.update() frequently
+
+    queue = new createjs.LoadQueue();
+    queue.on("complete", loaded);
+    queue.loadManifest(
+    [
+        {
+            id: "one",
+            src: "assets/img/logoJuego.png"
+        },
+        {
+            id: "two",
+            src: "assets/img/logoJuego2.png"
+        }
+    ]);
+}
+
+function loaded()
+{
+    update();
+}
+
+function update()
+{
+    createjs.Ticker.on("tick", function()
+    {
+        var img1 = queue.getResult("one");
+        var img2 = queue.getResult("two");
+
+        var someBitmap = new createjs.Bitmap(img1);
+        stage.addChild(someBitmap); //first image is visible now
+
+        //let's wait for a second and then call the function
+        //img2 is reference to the second image
+        setTimeout(function(){
+            if(someBitmap.image == img1)
+            {
+                someBitmap.image = null;
+                changeImage(someBitmap,img2);
+            }
+            else
+            {
+                someBitmap.image = null;
+                changeImage(someBitmap,img1);
+            }
+            
+        },2000);
+    });
+}
+
+function changeImage(bitmap,img)
+{
+    bitmap.image=img; //so image is changed
+}
+</script>
+</head>
+<body onload="init();">
+    <canvas id="canvas" width="600" height="400"></canvas>
+</body>
+</html>
